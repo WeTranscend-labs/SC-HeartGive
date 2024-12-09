@@ -6,6 +6,7 @@ import {
   TxHash,
   fromHex,
   toHex,
+  app,
 } from 'https://deno.land/x/lucid@0.8.3/mod.ts';
 import * as cbor from 'https://deno.land/x/cbor@v1.4.1/index.js';
 
@@ -31,12 +32,66 @@ async function readValidator(): Promise<SpendingValidator> {
 }
 
 const Datum = Data.Object({
-  lock_until: Data.BigInt,
-  owner: Data.String,
-  benificiary: Data.String,
+  admin: Data.String,
+  fund_owner: Data.String,
+  tx_hash_history: Data.Array(Data.String()),
 });
 
 type Datum = Data.Static<typeof Datum>;
+
+const jsonData = JSON.stringify(
+  {
+    organizationName: 'GTVT',
+    organizationInfo: {
+      description:
+        'sadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffff',
+      website: 'GTVT',
+      email: 'quan02042004@gmail.com',
+      phone: '+84938601892',
+      address: '97/1c, ấp tam đông, xã thơi tam thôn',
+      socialLinks: {
+        facebook: 'GTVT',
+        twitter: 'GTVT',
+        instagram: 'GTVT',
+        linkedin: 'GTVT',
+      },
+    },
+    purpose:
+      'sadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffffsadfsdfsdffff',
+    targetAmount: 100,
+    walletAddress: '97/1c, ấp tam đông, xã thơi tam thôn',
+    category: 'Education',
+    tags: [],
+  },
+  null,
+  0
+);
+
+const temp_object = {
+  organizationName: 'GTVT',
+  organizationInfo: {
+    description:
+      'Chúng tôi là tổ chức từ thiện Tuổi Hồng, thành lập để giúp các trẻ nhỏ vùng cao',
+    website: 'GTVT',
+    email: 'quan02042004@gmail.com',
+    phone: '+84938601892',
+    address: '97/1c, ấp tam đông, xã thơi tam thôn',
+    socialLinks: {
+      facebook: 'GTVT',
+      twitter: 'GTVT',
+      instagram: 'GTVT',
+      linkedin: 'GTVT',
+    },
+  },
+  purpose:
+    'Chúng tôi là tổ chức từ thiện Tuổi Hồng, thành lập để giúp các trẻ nhỏ vùng cao',
+  targetAmount: 100,
+  walletAddress: '97/1c, ấp tam đông, xã thơi tam thôn',
+  category: 'Education',
+  tags: [],
+};
+
+// console.log(cbor.decode(cbor.encode(jsonData)));
 
 async function lock(
   lovelace: BigInt,
@@ -45,7 +100,12 @@ async function lock(
   const contractAddress = lucid.utils.validatorToAddress(validator);
   const tx = await lucid
     .newTx()
-    .payToContract(contractAddress, { inline: datum }, { lovelace })
+    .payToContract(contractAddress + '_1', { inline: datum }, { lovelace })
+    .attachMetadata(721, {
+      111: {
+        data: cbor.encode(jsonData),
+      },
+    })
     .complete();
 
   const signedTx = await tx.sign().complete();
@@ -63,16 +123,19 @@ async function main() {
   ).paymentCredential?.hash;
   const datum = Data.to<Datum>(
     {
-      lock_until: lock_until,
-      owner:
+      admin:
         ownerPublicKeyHash ??
         '0000000000000000000000000000000000000000000000000000000000',
-      benificiary:
-        benificiaryPublicKeyHash ??
-        '0000000000000000000000000000000000000000000000000000000000',
+      fund_owner: benificiaryPublicKeyHash ?? 'fund_owner',
     },
     Datum
   );
+
+  const contractAddress = lucid.utils.validatorToAddress(validator);
+
+  const temp = await lucid.utxosAt(contractAddress);
+
+  console.log(contractAddress);
 
   const lockUntilDate = new Date(Number(lock_until) * 1000); // Chuyển đổi từ giây sang mili giây
 
@@ -99,6 +162,8 @@ async function main() {
   await lucid.awaitTx(txLock);
 
   console.log('Lock Id: {}', txLock);
+
+  // Collect And Mint
 }
 
 main();

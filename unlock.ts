@@ -6,10 +6,9 @@ import {
   TxHash,
   fromHex,
   toHex,
-  Redeemer,
   UTxO,
 } from 'https://deno.land/x/lucid@0.8.3/mod.ts';
-import * as cbor from 'https://deno.land/x/cbor@v1.4.1/index.js';
+import * as cbor from 'https://deno.land/x/cbor@v1.6.0/index.js';
 
 const lucid = await Lucid.new(
   new Blockfrost(
@@ -30,26 +29,43 @@ async function readValidator(): Promise<SpendingValidator> {
   };
 }
 
+console.log(Data);
+
 const Datum = Data.Object({
-  lock_until: Data.BigInt,
-  owner: Data.String,
-  benificiary: Data.String,
+  admin: Data.String,
+  fund_owner: Data.String,
+});
+
+const Redeemer = Data.Object({
+  is_contribute: Data.BigInt,
+  fund_owner: Data.String,
 });
 
 type Datum = Data.Static<typeof Datum>;
 
-async function unlock(
-  utxos: UTxO[],
-  currentTime: number,
+type Redeemer = Data.Static<typeof Redeemer>;
+
+async function contribute(
+  utxo: UTxO,
+  additionalLovelace: BigInt,
   { validator, redeemer }: { validator: SpendingValidator; redeemer: Redeemer }
 ): Promise<TxHash> {
+  const contractAddress = lucid.utils.validatorToAddress(validator);
   const tx = await lucid
     .newTx()
-    .collectFrom(utxos, redeemer)
+    .collectFrom([utxo], redeemer)
     .addSigner(await lucid.wallet.address())
-    .validFrom(currentTime - 100000)
-    .validTo(Date.now() + 10000000)
     .attachSpendingValidator(validator)
+    .payToContract(
+      contractAddress,
+      {
+        inline: utxo?.datum,
+      },
+      {
+        ...utxo.assets,
+        lovelace: (utxo.assets.lovelace ?? 0n) + additionalLovelace,
+      }
+    )
     .complete();
 
   const signedTx = await tx.sign().complete();
@@ -62,30 +78,44 @@ async function main() {
     await lucid.wallet.address()
   ).paymentCredential?.hash;
   const contractAddress = lucid.utils.validatorToAddress(validator);
+
   const scriptUTxOs = await lucid.utxosAt(contractAddress);
-  const currentTime = new Date().getTime();
 
-  const utxos = scriptUTxOs.filter((utxo) => {
-    try {
-      const datum = Data.from<Datum>(utxo.datum ?? '', Datum);
-      return (
-        datum.benificiary === benificiaryKeyHash &&
-        datum.lock_until <= currentTime
-      );
-    } catch (err) {
-      //   console.log(err);
-      return false;
-    }
+  const selectedUtxo = scriptUTxOs[0];
+
+  // console.log(scriptUTxOs);
+
+  // const utxos = scriptUTxOs.filter((utxo) => {
+  //   try {
+  //     const datum = Data.from<Datum>(utxo.datum ?? '', Datum);
+  //     return datum.fundOwner == benificiaryKeyHash;
+  //   } catch (err) {
+  //     //   console.log(err);
+  //     return false;
+  //   }
+  // });
+
+  // if (utxos.length === 0) {
+  //   console.log('No locked UTxOs found');
+  //   Deno.exit(1);
+  // }
+
+  const redeemer = Data.to<Redeemer>(
+    {
+      is_contribute: 1n,
+      fund_owner:
+        benificiaryKeyHash ??
+        '0000000000000000000000000000000000000000000000000000000000',
+    },
+    Redeemer
+  );
+
+  console.log(redeemer);
+
+  const txHash = await contribute(selectedUtxo, 10_000_000n, {
+    validator,
+    redeemer,
   });
-
-  if (utxos.length === 0) {
-    console.log('No locked UTxOs found');
-    Deno.exit(1);
-  }
-
-  const redeemer = Data.empty();
-
-  const txHash = await unlock(utxos, currentTime, { validator, redeemer });
 
   await lucid.awaitTx(txHash);
 
