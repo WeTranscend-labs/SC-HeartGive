@@ -20,7 +20,7 @@ type Redeemer {
 }
 
 validator {
-    fn fund(datum: Datum, redeemer: Redeemer, ctx: ScriptContext) -> Bool {
+    fn contract(datum: Datum, redeemer: Redeemer, ctx: ScriptContext) -> Bool {
         when ctx.purpose is {
             Spend(_) -> 
                 or {
