@@ -12,34 +12,34 @@
   },
   "validators": [
     {
-      "title": "test1.fund",
+      "title": "fund.fund",
       "datum": {
         "title": "datum",
         "schema": {
-          "$ref": "#/definitions/test1~1Datum"
+          "$ref": "#/definitions/fund~1Datum"
         }
       },
       "redeemer": {
         "title": "redeemer",
         "schema": {
-          "$ref": "#/definitions/test1~1Redeemer"
+          "$ref": "#/definitions/fund~1Redeemer"
         }
       },
       "compiledCode": "59013101000032323232323223232232253330073253330083370e900118049baa3001300a375400426464a66601466002600460186ea8010dd7180118061baa00914a2264a66601660120022660046006601a6ea8014dd7180218069baa00a1533300b3370e90010008a5114a06eb4c008c030dd50031119198008009bac301030113011301130113011301130113011300e375400644a66602000229404c94ccc038cdc79bae301200200414a226600600600260240024601a00229408c030c034004526136565333005300330063754002264646464a666018601c0042930b1bae300c001300c002375a6014002600e6ea8004594ccc00cc004c010dd5001099191919299980518060010a4c2c6eb8c028004c028008dd7180400098029baa00216370e90002b9a5573aaae7955cfaba15745",
       "hash": "3e466de2bcb5f1acaff6d2f1d82f3dfe7fe9bf27fcc385e7d82d305e"
     },
     {
-      "title": "test2.test2",
+      "title": "manage_fund.test2",
       "datum": {
         "title": "datum",
         "schema": {
-          "$ref": "#/definitions/test2~1Datum"
+          "$ref": "#/definitions/manage_fund~1Datum"
         }
       },
       "redeemer": {
         "title": "redeemer",
         "schema": {
-          "$ref": "#/definitions/test2~1Redeemer"
+          "$ref": "#/definitions/manage_fund~1Redeemer"
         }
       },
       "compiledCode": "59013101000032323232323223232232253330073253330083370e900118049baa3001300a375400426464a66601466002600460186ea8010dd7180118061baa00914a2264a66601660120022660046006601a6ea8014dd7180218069baa00a1533300b3370e90010008a5114a06eb4c008c030dd50031119198008009bac301030113011301130113011301130113011300e375400644a66602000229404c94ccc038cdc79bae301200200414a226600600600260240024601a00229408c030c034004526136565333005300330063754002264646464a666018601c0042930b1bae300c001300c002375a6014002600e6ea8004594ccc00cc004c010dd5001099191919299980518060010a4c2c6eb8c028004c028008dd7180400098029baa00216370e90002b9a5573aaae7955cfaba15745",
@@ -53,7 +53,7 @@
     "Int": {
       "dataType": "integer"
     },
-    "test1/Datum": {
+    "fund/Datum": {
       "title": "Datum",
       "anyOf": [
         {
@@ -73,7 +73,7 @@
         }
       ]
     },
-    "test1/Redeemer": {
+    "fund/Redeemer": {
       "title": "Redeemer",
       "anyOf": [
         {
@@ -93,7 +93,7 @@
         }
       ]
     },
-    "test2/Datum": {
+    "manage_fund/Datum": {
       "title": "Datum",
       "anyOf": [
         {
@@ -113,7 +113,7 @@
         }
       ]
     },
-    "test2/Redeemer": {
+    "manage_fund/Redeemer": {
       "title": "Redeemer",
       "anyOf": [
         {
