@@ -7,6 +7,8 @@ import {
   fromHex,
   toHex,
   app,
+  applyParamsToScript,
+  applyDoubleCborEncoding,
 } from 'https://deno.land/x/lucid@0.8.3/mod.ts';
 import * as cbor from 'https://deno.land/x/cbor@v1.4.1/index.js';
 
@@ -23,18 +25,19 @@ const lock_until = 1672843961000n;
 lucid.selectWalletFromSeed(await Deno.readTextFile('./owner.seed'));
 
 async function readValidator(): Promise<SpendingValidator> {
-  const validator = JSON.parse(await Deno.readTextFile('./plutus.json'))
-    .validators[0];
+  const validator = JSON.parse(
+    await Deno.readTextFile('./plutus.json')
+  ).validators.find((validator) => validator.title === 'fund.contract');
+
   return {
     type: 'PlutusV2',
-    script: toHex(cbor.encode(fromHex(validator.compiledCode))),
+    script: validator.compiledCode,
   };
 }
 
 const Datum = Data.Object({
   admin: Data.String,
   fund_owner: Data.String,
-  tx_hash_history: Data.Array(Data.String()),
 });
 
 type Datum = Data.Static<typeof Datum>;
@@ -97,10 +100,22 @@ async function lock(
   lovelace: BigInt,
   { validator, datum }: { validator: SpendingValidator; datum: String }
 ): Promise<TxHash> {
-  const contractAddress = lucid.utils.validatorToAddress(validator);
+  const encodedScript = toHex(cbor.encode(fromHex(validator.script)));
+  const benificiaryPublicKeyHash = lucid.utils.getAddressDetails(
+    await Deno.readTextFile('benificiary.addr')
+  ).paymentCredential?.hash;
+
+  const lockAddressScript = {
+    type: 'PlutusV2',
+    script: applyParamsToScript(encodedScript, [
+      '0000000000000000000000000000000000000000000000000000000000',
+    ]),
+  };
+
+  const contractAddress = lucid.utils.validatorToAddress(lockAddressScript);
   const tx = await lucid
     .newTx()
-    .payToContract(contractAddress + '_1', { inline: datum }, { lovelace })
+    .payToContract(contractAddress, { inline: datum }, { lovelace })
     .attachMetadata(721, {
       111: {
         data: cbor.encode(jsonData),
@@ -126,12 +141,22 @@ async function main() {
       admin:
         ownerPublicKeyHash ??
         '0000000000000000000000000000000000000000000000000000000000',
-      fund_owner: benificiaryPublicKeyHash ?? 'fund_owner',
+      fund_owner: '0000000000000000000000000000000000000000000000000000000001',
     },
     Datum
   );
 
-  const contractAddress = lucid.utils.validatorToAddress(validator);
+  const encodedScript = toHex(cbor.encode(fromHex(validator.script)));
+
+  const lockAddressScript = {
+    type: 'PlutusV2',
+    script: applyParamsToScript(encodedScript, [benificiaryPublicKeyHash]),
+  };
+
+  const contractAddress = lucid.utils.validatorToAddress(lockAddressScript);
+
+  console.log('Contract Address:', contractAddress);
+  console.log('Beneficiary Public Key Hash:', benificiaryPublicKeyHash);
 
   const temp = await lucid.utxosAt(contractAddress);
 

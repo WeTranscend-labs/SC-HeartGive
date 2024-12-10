@@ -8,8 +8,6 @@ use vesting/util.{must_be_signed_by, must_start_after}
 
 
 type Datum {
-    // start_time: POSIXTime,
-    // end_time: POSIXTime,
     admin: VerificationKeyHash,
     fund_owner: VerificationKeyHash,
 }
@@ -19,7 +17,7 @@ type Redeemer {
     fund_owner: VerificationKeyHash
 }
 
-validator {
+validator (fund_owner: VerificationKeyHash) {
     fn contract(datum: Datum, redeemer: Redeemer, ctx: ScriptContext) -> Bool {
         when ctx.purpose is {
             Spend(_) -> 
