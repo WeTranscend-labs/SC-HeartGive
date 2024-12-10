@@ -8,25 +8,24 @@ use vesting/util.{must_be_signed_by, must_start_after}
 
 
 type Datum {
-    admin: VerificationKeyHash,
-    fund_owner: VerificationKeyHash,
+    fundOwner: VerificationKeyHash,
 }
 
 type Redeemer {
-    is_contribute: Int,
-    fund_owner: VerificationKeyHash
+    isContribute: Int,
+    fundOwner: VerificationKeyHash
 }
 
-validator (fund_owner: VerificationKeyHash) {
+validator (fundOwner: VerificationKeyHash, uniqueId: ByteArray) {
     fn contract(datum: Datum, redeemer: Redeemer, ctx: ScriptContext) -> Bool {
         when ctx.purpose is {
             Spend(_) -> 
-                or {
-                    must_be_signed_by(ctx.transaction, datum.admin),
-                    when redeemer.is_contribute is {
+                // or {
+                    // must_be_signed_by(ctx.transaction, datum.admin),
+                    when redeemer.isContribute is {
                         // rút tiền về ví của tổ chức
                         0 -> {
-                            must_be_signed_by(ctx.transaction, datum.fund_owner)
+                            must_be_signed_by(ctx.transaction, datum.fundOwner)
                         }
                         // Đóng góp
                         1 -> {
@@ -35,7 +34,7 @@ validator (fund_owner: VerificationKeyHash) {
                         }
                         _ -> False
                     }
-                }
+                // }
             _ -> False
         }
     }

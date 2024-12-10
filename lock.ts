@@ -9,8 +9,9 @@ import {
   app,
   applyParamsToScript,
   applyDoubleCborEncoding,
-} from 'https://deno.land/x/lucid@0.8.3/mod.ts';
+} from 'https://deno.land/x/lucid@0.10.11/mod.ts';
 import * as cbor from 'https://deno.land/x/cbor@v1.4.1/index.js';
+// import { v4 as uuidv4 } from 'uuid';
 
 const lucid = await Lucid.new(
   new Blockfrost(
@@ -109,8 +110,11 @@ async function lock(
     type: 'PlutusV2',
     script: applyParamsToScript(encodedScript, [
       '0000000000000000000000000000000000000000000000000000000000',
+      'sadlhfsalflasfldsakngndskfg',
     ]),
   };
+
+  console.log('lockAddressScript: {}', lockAddressScript);
 
   const contractAddress = lucid.utils.validatorToAddress(lockAddressScript);
   const tx = await lucid
@@ -150,7 +154,10 @@ async function main() {
 
   const lockAddressScript = {
     type: 'PlutusV2',
-    script: applyParamsToScript(encodedScript, [benificiaryPublicKeyHash]),
+    script: applyParamsToScript(encodedScript, [
+      benificiaryPublicKeyHash,
+      'sadlhfsalflasfldsakngndskfg',
+    ]),
   };
 
   const contractAddress = lucid.utils.validatorToAddress(lockAddressScript);

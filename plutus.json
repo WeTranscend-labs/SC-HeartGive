@@ -27,14 +27,20 @@
       },
       "parameters": [
         {
-          "title": "fund_owner",
+          "title": "fundOwner",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        },
+        {
+          "title": "uniqueId",
           "schema": {
             "$ref": "#/definitions/ByteArray"
           }
         }
       ],
-      "compiledCode": "590136010000323232323232232232322322533300932533300a3370e900118059baa3001300c375400426464a666018660026004601c6ea8010dd7180118071baa00914a2264a66601a60120022660046006601e6ea8014dd7180218079baa00a1533300d3370e90010008a5114a06eb4c008c038dd50031119198008009bac3012301330133013301330133013301330133010375400644a66602400229404c94ccc040cdc79bae301400200414a226600600600260280024601e00229408c038c03c004526136565333007300330083754002264646464a66601c60200042930b1bae300e001300e002375a601800260126ea8004594ccc014c004c018dd5001099191919299980618070010a4c2c6eb8c030004c030008dd7180500098039baa00216370e90001bae0015734aae7555cf2ab9f5742ae89",
-      "hash": "c842b761e0ab4c560055f0c6fb138ad67075f4f307f141c2582c7db7"
+      "compiledCode": "590110010000323232323232232232232322322533300b533300b3370e900118061baa300f3010300d375400226464a66601a600e0022664464660020026eb0c050c054c054c054c054c054c054c054c054c048dd500191299980a0008a5013253330123371e6eb8c058008010528899801801800980b000980118079baa003375c6004601e6ea802054ccc034cdc3a400400229445281bad3001300e37540084602000229405261365653330093003300a3754002264646464a66602060240042930b1bae30100013010002375a601c00260166ea8004594ccc01cc004c020dd500109919299980618070010a4c2c6eb8c030004c024dd50010b1b8748000dd70009bae0015734aae7555cf2ab9f5742ae881",
+      "hash": "c2d2c2e49e7d5145aa5af2a423f08394ede38ac70484d7150dce4844"
     },
     {
       "title": "manage_fund.contract",
@@ -45,13 +51,13 @@
         }
       },
       "redeemer": {
-        "title": "redeemer",
+        "title": "_redeemer",
         "schema": {
-          "$ref": "#/definitions/manage_fund~1Redeemer"
+          "$ref": "#/definitions/Void"
         }
       },
-      "compiledCode": "59013101000032323232323223232232253330073253330083370e900118049baa3001300a375400426464a66601466002600460186ea8010dd7180118061baa00914a2264a66601660120022660046006601a6ea8014dd7180218069baa00a1533300b3370e90010008a5114a06eb4c008c030dd50031119198008009bac301030113011301130113011301130113011300e375400644a66602000229404c94ccc038cdc79bae301200200414a226600600600260240024601a00229408c030c034004526136565333005300330063754002264646464a666018601c0042930b1bae300c001300c002375a6014002600e6ea8004594ccc00cc004c010dd5001099191919299980518060010a4c2c6eb8c028004c028008dd7180400098029baa00216370e90002b9a5573aaae7955cfaba15745",
-      "hash": "3e466de2bcb5f1acaff6d2f1d82f3dfe7fe9bf27fcc385e7d82d305e"
+      "compiledCode": "58dc0100003232323232322322322533300653330063370e900118039baa300a300b30083754002264664464660020026eb0c038c03cc03cc03cc03cc03cc03cc03cc03cc030dd50019129998070008a50132533300c3371e6eb8c0400080105288998018018009808000980098049baa002375c600260126ea80188c02c0045280a4c26cac64a66600a66e1d2000300600115333008300700114985858dd5000a99980119b8748000c00cdd5000899191919299980498058010a4c2c6eb8c024004c024008dd7180380098021baa001165734aae7555cf2ab9f5742ae89",
+      "hash": "4ffff129677e7252f6237cdaf87c72c613fdbbd5a2ee18191231bfbc"
     }
   ],
   "definitions": {
@@ -60,6 +66,17 @@
     },
     "Int": {
       "dataType": "integer"
+    },
+    "Void": {
+      "title": "Unit",
+      "description": "The nullary constructor.",
+      "anyOf": [
+        {
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        }
+      ]
     },
     "fund/Datum": {
       "title": "Datum",
@@ -70,11 +87,7 @@
           "index": 0,
           "fields": [
             {
-              "title": "admin",
-              "$ref": "#/definitions/ByteArray"
-            },
-            {
-              "title": "fund_owner",
+              "title": "fundOwner",
               "$ref": "#/definitions/ByteArray"
             }
           ]
@@ -90,11 +103,11 @@
           "index": 0,
           "fields": [
             {
-              "title": "is_contribute",
+              "title": "isContribute",
               "$ref": "#/definitions/Int"
             },
             {
-              "title": "fund_owner",
+              "title": "fundOwner",
               "$ref": "#/definitions/ByteArray"
             }
           ]
@@ -114,27 +127,7 @@
               "$ref": "#/definitions/ByteArray"
             },
             {
-              "title": "fund_owner",
-              "$ref": "#/definitions/ByteArray"
-            }
-          ]
-        }
-      ]
-    },
-    "manage_fund/Redeemer": {
-      "title": "Redeemer",
-      "anyOf": [
-        {
-          "title": "Redeemer",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "is_contribute",
-              "$ref": "#/definitions/Int"
-            },
-            {
-              "title": "fund_owner",
+              "title": "fundAddress",
               "$ref": "#/definitions/ByteArray"
             }
           ]
