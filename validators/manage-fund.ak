@@ -8,8 +8,9 @@ use vesting/util.{must_be_signed_by, must_start_after}
 
 
 type Datum {
-    admin: VerificationKeyHash,
-    fundAddress: ByteArray
+    // admin: VerificationKeyHash,
+    fundAddress: ByteArray,
+    isVerified: Int
 }
 
 
@@ -17,7 +18,12 @@ validator {
     fn contract(datum: Datum, _redeemer: Void, ctx: ScriptContext) -> Bool {
         when ctx.purpose is {
             Spend(_) -> 
-                must_be_signed_by(ctx.transaction, datum.admin)
+                // must_be_signed_by(ctx.transaction, datum.admin)
+                when datum.isVerified is {
+                    0 -> True
+                    1 -> True
+                    _ -> False
+                }
             _ -> False
         }
     }

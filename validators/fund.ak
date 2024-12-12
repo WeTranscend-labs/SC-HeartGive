@@ -1,7 +1,6 @@
 use aiken/hash.{Blake2b_224, Hash}
 use aiken/transaction/credential.{VerificationKey}
 use aiken/interval.{Finite}
-use aiken/list
 use aiken/transaction.{Transaction, ScriptContext, Spend, ValidityRange}
 use vesting/constant.{VerificationKeyHash, POSIXTime}
 use vesting/util.{must_be_signed_by, must_start_after}

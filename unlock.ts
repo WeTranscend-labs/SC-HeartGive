@@ -50,7 +50,9 @@ async function contribute(
   additionalLovelace: BigInt,
   { validator, redeemer }: { validator: SpendingValidator; redeemer: Redeemer }
 ): Promise<TxHash> {
-  const contractAddress = lucid.utils.validatorToAddress(validator);
+  // const contractAddress = lucid.utils.validatorToAddress(validator);
+  const contractAddress: string =
+    'addr_test1wr539xfv8psyhejd8yukjfuu9j2w9h5y9t2lukz04348aes7hvm5e';
   const tx = await lucid
     .newTx()
     .collectFrom([utxo], redeemer)
