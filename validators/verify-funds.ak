@@ -5,6 +5,7 @@ use aiken/list
 use aiken/transaction.{Transaction, ScriptContext, Spend, ValidityRange}
 use vesting/constant.{VerificationKeyHash, POSIXTime}
 use vesting/util.{must_be_signed_by, must_start_after}
+use aiken/bytearray.{length}
 
 
 type Datum {
@@ -16,8 +17,11 @@ validator {
     fn contract(datum: Datum, _redeemer: Void, ctx: ScriptContext) -> Bool {
         when ctx.purpose is {
             Spend(_) -> 
-                // must_be_signed_by(ctx.transaction, datum.admin)
-                True
+                {
+                    let is_fund_address_valid = length(datum.fundAddress) > 0
+
+
+                is_fund_address_valid}
             _ -> False
         }
     }
